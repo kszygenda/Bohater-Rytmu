@@ -19,34 +19,52 @@ private:
     int combo, input_number, max_combo;
     float hp=100;
     float acc;
+    int multi_input=1;
+    bool has_multi=0;
 public:
     friend class Note;
     Poziom();
-    Poziom(std::string nazwa_piosenki, std::string nazwa_pliku_piosenki,std::string backgr_name,std::string dif,float diff);
+    Poziom(std::string nazwa_piosenki, std::string nazwa_pliku_piosenki,std::string backgr_name,std::string dif,float diff,int mult_input);
     void inicjalizacja();
+    void inicjalizacja_poziomu();
+    //tutaj funkcje zwracajace/liczace proste wartosci
     void Max_Combo();
     int Combo();
     float Accuracy();
-    int give_hp();
+    float give_hp();
     void set_hp();
+    //funkcje managementu miedzy poziomami, wyswietlanie statystyk, konczenie poziomu,zmiana patternu
     void reset_stats();
     void scoreboard();
-    void inicjalizacja_poziomu();
     void back_to_menu();
+    void change_pattern();
+    //Funkcje kończące poziom jeżeli Gracz skonczy poziom/przegra.
+    void end(sf::RenderWindow &window,sf::Clock &clock);
+    void lose(sf::RenderWindow &window);
+    //funkcje kalkulujące potrzebne do generacji poziomu/wyswietlenia danych poziomu
     float calculate_nps();
     float calculate_actual_nps();
-    //Funkcje Judgement zmienające prywatne skladowe poziomu
+    //do zrobienia, wyswietla w menu te wszystkie nazwy i te inne drobnostki
+    void wyswietl_staty(sf::RenderWindow &window);
+    //metoda oceniajaca postepy gracza
+    void Judgement(sf::Text &text,Note &note);
+    //Funkcje Judgement zmieniające prywatne skladowe poziomu
     void Marvelous(sf::Text &text);
     void Perfect(sf::Text &text);
     void Great(sf::Text &text);
     void Good(sf::Text &text);
     void Ok(sf::Text &text);
     void Miss(sf::Text &text);
-    //Funkcje kończące poziom jeżeli Gracz skonczy poziom/przegra/wyjdzie z poziomu
-    //do zrobienia wyjście z poziomu
-    void end(sf::RenderWindow &window,sf::Clock &clock);
-    void lose(sf::RenderWindow &window);
-    friend void gra(Poziom &poz);
+    //funkcje inputowe, management obiektow
+    sf::Text input(std::vector<Note> &vec,sf::Text &text);
+    sf::Text input_Miss(std::vector<Note> &vec,sf::Text &text);
+    //random number generator
+    int radom();
+    //tutaj funkcje tworzenia poziomu + gra
+    void create_shapes(std::vector<std::unique_ptr<sf::Shape>> &vecptr);
+    void generate_level(std::vector<std::vector<Note>> &WekDFJK,float nps,sf::Clock &clock,sf::Clock &leveltimer);
+    void gra();
+    void animacja();
     friend void song_selection();
 
 

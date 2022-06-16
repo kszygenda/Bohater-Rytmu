@@ -1,6 +1,4 @@
-#include "note.h"
-#include "Poziom.h"
-#include "friendvoids.cpp"
+#include "Poziom.cpp"
 
 int main() {
 song_selection();

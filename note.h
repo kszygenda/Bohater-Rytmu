@@ -7,22 +7,18 @@
 #include <iostream>
 #include <cstdlib>
 #include <vector>
-#include "Poziom.h"
 
 class Note : public sf::CircleShape
 {
-
+private:
+    float vy=1800;
 public:
+    friend class Poziom;
     Note(sf::Vector2f pos);
     Note();
     int return_speed();
-    friend class Poziom;
     void animate(sf::Time elapsed);
-    //do skonczenia
     bool check_range();
-    friend void generate_level(std::vector<Note> &LineD,std::vector<Note> &LineF,std::vector<Note> &LineJ,std::vector<Note> &LineK);
-private:
-    float vy=1800;
 };
 
 
