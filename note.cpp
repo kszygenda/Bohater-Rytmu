@@ -4,7 +4,7 @@
 
 Note::Note(sf::Vector2f pos) : CircleShape(72){
     setPosition(pos);
-    setFillColor(sf::Color(255, 255, 255));
+    setFillColor(sf::Color(164, 227, 245));
 }
 Note::Note(){}
 
@@ -19,7 +19,7 @@ void Note::animate(sf::Time elapsed){
 //funkcja sprawdzająca czy obiekt znajduje się w zakresie "Judgementu"
 bool Note::check_range(){
     sf::FloatRect circlebounds = getGlobalBounds();
-    if(circlebounds.top<800+vy*0.14 && circlebounds.top>800-vy*0.14) {return true;}
+    if(circlebounds.top<800+vy*0.18 && circlebounds.top>800-vy*0.2) {return true;}
     else {return false;}
 }
 

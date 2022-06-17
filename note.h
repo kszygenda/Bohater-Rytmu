@@ -11,7 +11,7 @@
 class Note : public sf::CircleShape
 {
 private:
-    float vy=1800;
+    float vy=2200;
 public:
     friend class Poziom;
     Note(sf::Vector2f pos);

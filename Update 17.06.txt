@@ -1,0 +1,21 @@
+Update 17.06
+Zmiany dotyczące samej rozgrywki:
+-Dodano zmiane judgement line'u podczas inputu (dzieki temu widać input gracza)
+-Judgement line zmienia kolor w zależności od oceny (i bedzie utrzymywal ten kolor do momentu kiedy gracz nie puści klawisza)
+-Dodano hit error bar pokazujący ostatnie inputy gracza oraz pokazujące aktualne inputy (służy do tego nawigacyjny punkt który zmienia pozycje)
+Zmiany w kodzie:
+-Dodano 3 metody obsługi hit error bar'u (hit_error_bar,move_hit_error,fade_error_bar) 
+1. Generuje obiekt w zaleznosci od inputu (tutaj dzieje się kalkulacja oddalenia od perfekcji)
+2. Rusza nawigacyjnym obiektem tak aby widać było gdzie znajduje się ostatni input
+3. Sprawia, że każdy wygenerowany obiekt "powoli zanika" po czym usuwa go i zwalnia pamięć.
+  
+-małe zmiany w metodach input,judgement, funkcje judgementu (tak aby poza samym tekstem, zmienialy one Judgement_line oraz hit error bar)
+
+
+Projekt jest dostępny na githubie (wszystkie update'y projektu były tam zamieszczane)
+https://github.com/kszygenda/Bohater-Rytmu
+
+
+Link do "Gameplayu" (udpate 17.06)
+https://youtu.be/FuksAykghcw
+

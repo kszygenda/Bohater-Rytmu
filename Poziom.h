@@ -47,17 +47,17 @@ public:
     //do zrobienia, wyswietla w menu te wszystkie nazwy i te inne drobnostki
     void wyswietl_staty(sf::RenderWindow &window);
     //metoda oceniajaca postepy gracza
-    void Judgement(sf::Text &text,Note &note);
+    void Judgement(sf::Text &text, Note &note, sf::Shape &circle, sf::Shape &rectangle);
     //Funkcje Judgement zmieniające prywatne skladowe poziomu
-    void Marvelous(sf::Text &text);
-    void Perfect(sf::Text &text);
-    void Great(sf::Text &text);
-    void Good(sf::Text &text);
-    void Ok(sf::Text &text);
-    void Miss(sf::Text &text);
+    void Marvelous(sf::Text &text,sf::Shape &circle,sf::Shape &rectangle);
+    void Perfect(sf::Text &text,sf::Shape &circle,sf::Shape &rectangle);
+    void Great(sf::Text &text,sf::Shape &circle,sf::Shape &rectangle);
+    void Good(sf::Text &text,sf::Shape &circle,sf::Shape &rectangle);
+    void Ok(sf::Text &text,sf::Shape &circle,sf::Shape &rectangle);
+    void Miss(sf::Text &text,sf::Shape &circle,sf::Shape &rectangle);
     //funkcje inputowe, management obiektow
-    sf::Text input(std::vector<Note> &vec,sf::Text &text);
-    sf::Text input_Miss(std::vector<Note> &vec,sf::Text &text);
+    sf::Text input(std::vector<Note> &vec, sf::Text &text, sf::Shape &circle, std::vector<std::unique_ptr<sf::Shape> > &recs);
+    sf::Text input_Miss(std::vector<Note> &vec, sf::Text &text, sf::Shape &circle, std::vector<std::unique_ptr<sf::Shape> > &recs);
     //random number generator
     int radom();
     //tutaj funkcje tworzenia poziomu + gra

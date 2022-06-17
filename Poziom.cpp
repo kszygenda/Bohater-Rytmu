@@ -189,40 +189,75 @@ void Poziom::scoreboard(){
 
 }
 //Funkcja wywolywana przy inpucie (sf::Text input dalej)
-void Poziom::Judgement(sf::Text &text,Note &note){
+void Poziom::Judgement(sf::Text &text, Note &note, sf::Shape &circle,sf::Shape &rectangle){
     sf::FloatRect circlebounds = note.getGlobalBounds();
-    if(circlebounds.top<800+note.return_speed()*0.02 && circlebounds.top>800-note.return_speed()*0.02){
-        Marvelous(text);
+    if(circlebounds.top<800+note.return_speed()*0.03 && circlebounds.top>800-note.return_speed()*0.02){
+        Marvelous(text,circle,rectangle);
         return;
     }
-    if(circlebounds.top<800+note.return_speed()*0.05 && circlebounds.top>800-note.return_speed()*0.05){
-        Perfect(text);
+    if(circlebounds.top<800+note.return_speed()*0.06 && circlebounds.top>800-note.return_speed()*0.05){
+        Perfect(text,circle,rectangle);
         return;
     }
-    if(circlebounds.top<800+note.return_speed()*0.08 && circlebounds.top>800-note.return_speed()*0.08){
-        Great(text);
+    if(circlebounds.top<800+note.return_speed()*0.09 && circlebounds.top>800-note.return_speed()*0.08){
+        Great(text,circle,rectangle);
         return;
     }
-    if(circlebounds.top<800+note.return_speed()*0.1 && circlebounds.top>800-note.return_speed()*0.1){
-        Good(text);
+    if(circlebounds.top<800+note.return_speed()*0.12 && circlebounds.top>800-note.return_speed()*0.1){
+        Good(text,circle,rectangle);
         return;
     }
-    if(circlebounds.top<800+note.return_speed()*0.12 && circlebounds.top>800-note.return_speed()*0.12){
-        Ok(text);
+    if(circlebounds.top<800+note.return_speed()*0.15 && circlebounds.top>800-note.return_speed()*0.12){
+        Ok(text,circle,rectangle);
         return;
     }
-    if(circlebounds.top>800+note.return_speed()*0.14){
-        Miss(text);
+    if(circlebounds.top>800+note.return_speed()*0.18 || circlebounds.top<800-note.return_speed()*0.18){
+        Miss(text,circle,rectangle);
+    }
+}
+
+
+void hit_error_bar(std::vector<std::unique_ptr<sf::Shape>> &recs,Note note){
+    float calculate_error = 955-(800-note.getGlobalBounds().top)/5;
+    recs.emplace_back(std::make_unique<sf::RectangleShape>(sf::Vector2f(2,14)));
+    std::vector<std::unique_ptr<sf::Shape>>::iterator it=recs.end()-1;
+    (*it)->setPosition(calculate_error,553);
+
+}
+void move_hit_error(std::vector<std::unique_ptr<sf::Shape>> &recs,sf::Shape &moving_rectangle,sf::Time elapsed){
+    if(!recs.empty()){
+    std::vector<std::unique_ptr<sf::Shape>>::iterator it=recs.end()-1;
+    if((*it)->getPosition().x!=moving_rectangle.getPosition().x){
+        if((*it)->getPosition().x>moving_rectangle.getPosition().x)
+            moving_rectangle.move(150*elapsed.asSeconds(),0);
+        if((*it)->getPosition().x<moving_rectangle.getPosition().x)
+            moving_rectangle.move(-150*elapsed.asSeconds(),0);
+    }
+    }
+}
+void fade_error_bar(std::vector<std::unique_ptr<sf::Shape>> &recs,sf::Clock &fade_clock){
+    if(!recs.empty() && fade_clock.getElapsedTime().asMilliseconds()>2){
+    for(auto &r: recs){
+        int alpha=(*r).getFillColor().a-1;
+        (*r).setFillColor(sf::Color((*r).getFillColor().r,(*r).getFillColor().g,(*r).getFillColor().b,alpha));
+    }
+    std::vector<std::unique_ptr<sf::Shape>>::iterator it=recs.begin();
+    if((*it)->getFillColor().a<10){
+        recs.erase(it);
+    }
+    fade_clock.restart();
     }
 }
 //funkcja input czyli reagująca na "granie" gracza
-sf::Text Poziom::input(std::vector<Note> &vec,sf::Text &text)
+sf::Text Poziom::input(std::vector<Note> &vec,sf::Text &text,sf::Shape &circle,std::vector<std::unique_ptr<sf::Shape>> &recs)
 {
     if(!vec.empty()){
         std::vector<Note>::iterator it=vec.begin();
         if(it->check_range()){
             {
-                Judgement(text,*it);
+                hit_error_bar(recs,*it);
+                std::vector<std::unique_ptr<sf::Shape>>::iterator itt=recs.end()-1;
+                Judgement(text,*it,circle,*(*itt));
                 vec.erase(it);
                 return text;
             }
@@ -231,13 +266,15 @@ sf::Text Poziom::input(std::vector<Note> &vec,sf::Text &text)
     return text;
 }
 //funkcja input_miss czyli reagowanie czy obiekt nie wyszedł poza obszar oceny, jezeli tak to usuwa go i zwraca "Miss"
-sf::Text Poziom::input_Miss(std::vector<Note> &vec,sf::Text &text)
+sf::Text Poziom::input_Miss(std::vector<Note> &vec,sf::Text &text,sf::Shape &circle,std::vector<std::unique_ptr<sf::Shape>> &recs)
 {
     if(!vec.empty()){
         std::vector<Note>::iterator it=vec.begin();
-        if(!it->check_range()&&it->getGlobalBounds().top>800+it->return_speed()*0.14)
+        if(!it->check_range()&&it->getGlobalBounds().top>800+it->return_speed()*0.18)
         {
-            Judgement(text,*it);
+            hit_error_bar(recs,*it);
+            std::vector<std::unique_ptr<sf::Shape>>::iterator itt=recs.end()-1;
+            Judgement(text,*it,circle,*(*itt));
             vec.erase(it);
             return text;
         }
@@ -245,54 +282,72 @@ sf::Text Poziom::input_Miss(std::vector<Note> &vec,sf::Text &text)
     return text;
 }
 //funkcje judgementu, ocena gry w czasie rzeczywistym
-void Poziom::Marvelous(sf::Text &text){
+void Poziom::Marvelous(sf::Text &text,sf::Shape &circle,sf::Shape &rectangle){
+    sf::Color color(227, 226, 225);
+    circle.setOutlineColor(color);
+    rectangle.setFillColor(color);
     text.setString("Marvelous!");
-    text.setFillColor(sf::Color(227, 226, 225));
+    text.setFillColor(color);
     combo++;
     input_number++;
     hp+=3;
     acc+=1;
     m++;
 }
-void Poziom::Perfect(sf::Text &text){
+void Poziom::Perfect(sf::Text &text,sf::Shape &circle,sf::Shape &rectangle){
+    sf::Color color(252, 231, 0);
+    circle.setOutlineColor(color);
+    rectangle.setFillColor(color);
     text.setString("Perfect!");
-    text.setFillColor(sf::Color(252, 231, 0));
+    text.setFillColor(color);
     combo++;
     input_number++;
     hp+=1.5;
     acc+=0.925;
     p++;
 }
-void Poziom::Great(sf::Text &text){
+void Poziom::Great(sf::Text &text,sf::Shape &circle,sf::Shape &rectangle){
+    sf::Color color(49, 145, 7);
+    circle.setOutlineColor(color);
+    rectangle.setFillColor(color);
     text.setString("Great");
-    text.setFillColor(sf::Color(49, 145, 7));
+    text.setFillColor(color);
     combo++;
     input_number++;
     hp+=0.1;
     acc+=0.4;
     gr++;
 }
-void Poziom::Good(sf::Text &text){
+void Poziom::Good(sf::Text &text,sf::Shape &circle,sf::Shape &rectangle){
+    sf::Color color(2, 178, 237);
+    circle.setOutlineColor(color);
+    rectangle.setFillColor(color);
     text.setString("Good");
-    text.setFillColor(sf::Color(2, 178, 237));
+    text.setFillColor(color);
     combo++;
     input_number++;
     hp-=0.5;
     acc+=0;
     go++;
 }
-void Poziom::Ok(sf::Text &text){
+void Poziom::Ok(sf::Text &text,sf::Shape &circle,sf::Shape &rectangle){
+    sf::Color color(147, 6, 194);
+    circle.setOutlineColor(color);
+    rectangle.setFillColor(color);
     text.setString("Okay");
-    text.setFillColor(sf::Color(147, 6, 194));
+    text.setFillColor(color);
     combo++;
     input_number++;
     hp-=2;
     acc+=-1;
     ok++;
 }
-void Poziom::Miss(sf::Text &text){
+void Poziom::Miss(sf::Text &text,sf::Shape &circle,sf::Shape &rectangle){
+    sf::Color color(191, 4, 4);
+    circle.setOutlineColor(color);
+    rectangle.setFillColor(color);
     text.setString("Miss");
-    text.setFillColor(sf::Color(191, 4, 4));
+    text.setFillColor(color);
     combo=0;
     input_number++;
     hp-=7;
@@ -405,9 +460,9 @@ void Poziom::generate_level(std::vector<std::vector<Note>> &WekDFJK, float nps, 
         clock.restart();
     }
 }
-
+//funkcja edytująca wektor(dodajaca obiekty) aby mial wszystkie potrzebne figury
 void Poziom::create_shapes(std::vector<std::unique_ptr<sf::Shape>> &vecptr){
-    //funkcja edytująca wektor(dodajaca obiekty) aby mial wszystkie potrzebne figury
+
     vecptr.emplace_back(std::make_unique<sf::RectangleShape>(sf::Vector2f(644.0,1080.0)));
     vecptr.emplace_back(std::make_unique<sf::RectangleShape>(sf::Vector2f(300.0,200.0)));
     vecptr.emplace_back(std::make_unique<sf::RectangleShape>(sf::Vector2f(280.0,30.0)));
@@ -417,8 +472,8 @@ void Poziom::create_shapes(std::vector<std::unique_ptr<sf::Shape>> &vecptr){
     for(int i=3;i<7;i++){
         (*vecptr[i]).setOutlineThickness(4);
         (*vecptr[i]).setFillColor(sf::Color::Black);
-        (*vecptr[i]).setOutlineColor(sf::Color(105,105,105));
-        (*vecptr[i]).setPosition((640+156*(i-3)),800);
+        (*vecptr[i]).setOutlineColor(sf::Color(255,255,255,105));
+        (*vecptr[i]).setPosition((650+156*(i-3)),800);
     }
     //kolor vsrg bckgr
     for(int i=0;i<2;i++){
@@ -429,6 +484,20 @@ void Poziom::create_shapes(std::vector<std::unique_ptr<sf::Shape>> &vecptr){
     (*vecptr[0]).setPosition(640,0);
     (*vecptr[1]).setPosition(1620,0);
     (*vecptr[2]).setPosition(1630,130);
+    //te są potrzebne do hit error baru 7 srodkowy do orientacji 8 - adaptacyjny ktory zmieni pozycje i kolor w zaleznosci od judgementu 9-nawigacyjny ruszajacy
+    //do zmiany, zostanie orientacyjny i ruszający się, zrobi sie wektor adaptacyjnych ktore zanikają z ekranu xD
+    //ale to jutro
+    vecptr.emplace_back(std::make_unique<sf::RectangleShape>(sf::Vector2f(3,20)));
+    //vecptr.emplace_back((std::make_unique<sf::RectangleShape>(sf::Vector2f(3,14)))'
+    vecptr.emplace_back(std::make_unique<sf::RectangleShape>(sf::Vector2f(4,6)));
+    (*vecptr[7]).setFillColor(sf::Color::White);
+    (*vecptr[7]).setPosition(954,550);
+    (*vecptr[8]).setFillColor(sf::Color::Yellow);
+    (*vecptr[8]).setPosition(954,580);
+
+}
+void reverse_animacja_Judgement_line(sf::Shape &circle){
+    circle.setOutlineColor(sf::Color(255,255,255,105));
 }
 //funkcja gameplayu
 void Poziom::gra(){
@@ -436,7 +505,7 @@ void Poziom::gra(){
     //restartujemy statystyki poziomu, ponieważ są one cały czas w pamięci
     reset_stats();
     //clock do animacji,tworzenia obiektow,konczenia poziomu
-    sf::Clock clock,notes_clock,music_time;
+    sf::Clock clock,notes_clock,music_time,fade_error_clock;
     //tworzenie line'ów
     std::vector<Note> vecD,vecF,vecJ,vecK;
     //jako argument funkcji generate level (po zmianie) potrzeba wektora wektorów
@@ -455,6 +524,8 @@ void Poziom::gra(){
     //testowy polimorfizm (Judgement Line, box vsrg, box na bckgr accuracy;
     std::vector<std::unique_ptr<sf::Shape>> shapes;
     create_shapes(shapes);
+    std::vector<std::unique_ptr<sf::Shape>> hit_error_rec;
+
 
     //tworzenie textow (Ocena gry + combo + accuracy)
     std::vector<sf::Text> texty(3);
@@ -505,30 +576,40 @@ void Poziom::gra(){
             }
             if(event.type == sf::Event::KeyPressed){
                 if(event.key.code==sf::Keyboard::D){
-                    input(vecDFJK[0],texty[0]);
+                    input(vecDFJK[0],texty[0],*(shapes[3]),hit_error_rec);
 
                 }
                 if(event.key.code==sf::Keyboard::F){
-                    input(vecDFJK[1],texty[0]);
+                    input(vecDFJK[1],texty[0],*(shapes[4]),hit_error_rec);
 
                 }
                 if(event.key.code==sf::Keyboard::J){
-                    input(vecDFJK[2],texty[0]);
+                    input(vecDFJK[2],texty[0],*(shapes[5]),hit_error_rec);
 
                 }
                 if(event.key.code==sf::Keyboard::K){
-                    input(vecDFJK[3],texty[0]);
+                    input(vecDFJK[3],texty[0],*(shapes[6]),hit_error_rec);
 
                 }
 
+
+            } if(event.type == sf::Event::KeyReleased){
+                if(event.key.code==sf::Keyboard::D)
+                    reverse_animacja_Judgement_line(*(shapes[3]));
+                if(event.key.code==sf::Keyboard::F)
+                    reverse_animacja_Judgement_line(*(shapes[4]));
+                if(event.key.code==sf::Keyboard::J)
+                    reverse_animacja_Judgement_line(*(shapes[5]));
+                if(event.key.code==sf::Keyboard::K)
+                    reverse_animacja_Judgement_line(*(shapes[6]));
             }
 
         }
         //sprawdzanie judgementu czy nie wylazła z zakresu, czyli dalej sam element gry oceniający rozgrywke gracza
-        input_Miss(vecDFJK[0],texty[0]);
-        input_Miss(vecDFJK[1],texty[0]);
-        input_Miss(vecDFJK[2],texty[0]);
-        input_Miss(vecDFJK[3],texty[0]);
+        input_Miss(vecDFJK[0],texty[0],*(shapes[3]),hit_error_rec);
+        input_Miss(vecDFJK[1],texty[0],*(shapes[4]),hit_error_rec);
+        input_Miss(vecDFJK[2],texty[0],*(shapes[5]),hit_error_rec);
+        input_Miss(vecDFJK[3],texty[0],*(shapes[6]),hit_error_rec);
         //tutaj zaczynamy rysowanie + zmiane textu w zaleznosci od wykonanych funkcji
         texty[1].setString(std::to_string(Combo()));
         texty[2].setString(std::to_string(100*Accuracy())+"%");
@@ -540,6 +621,8 @@ void Poziom::gra(){
             for(auto &vecc : vec)
                 vecc.animate(elapsed);
 
+        move_hit_error(hit_error_rec,*shapes[8],elapsed);
+        fade_error_bar(hit_error_rec,fade_error_clock);
         //rysowanie
 
         window.draw(sprite);
@@ -555,6 +638,8 @@ void Poziom::gra(){
 
         for(auto &t : texty)
             window.draw(t);
+        for(auto &r : hit_error_rec)
+            window.draw(*r);
         //end current frame
         window.display();
 
@@ -646,3 +731,9 @@ void song_selection(){
         window.display();
     }
 }
+
+
+
+
+
+
