@@ -1,0 +1,25 @@
+Update 16.06
+Zmiany dotyczące samej rozgrywki:
+-dodano nowe mozliwosci generowania poziomów, w zaleznosci od wybranego typu patternu (a bedzie ich jeszcze wiecej. moze)
+-mozna zmieniac typ patternu z poziomu menu
+-notes nie beda sie generowac gdy poziom jest bliski koncu
+-dodano ekran gdy uda się ukończyć (wygrać) poziom
+Zmiany w kodzie:
+-Usunięcie friendvoids.cpp
+-zmiana wiekszosci metod z friend voids na metody klasy Poziom
+-dodano małe funkcje potrzebne gdy nie są to już zaprzyjaźnione metody (proste funkcje zwracające kopie wartości skladowych klasy)
+Zmiana w Poziom:
+-nowe skladowe do generacji nowych patternow
+-nowe funkcje do generacji nowych patternow
+-nowa funkcja wyswietlajaca dane poziomu
+-nowe funkcje generujące potrzebne figury do głównej gry (wykorzystanie polimorfizmu, i hope)
+-generalne usprawnienia funkcji (chyba)
+
+
+Projekt jest dostępny na githubie (wszystkie update'y projektu były tam zamieszczane)
+https://github.com/kszygenda/Bohater-Rytmu
+
+
+Link do "Gameplayu"
+https://youtu.be/d4H0N-ScGi0
+
